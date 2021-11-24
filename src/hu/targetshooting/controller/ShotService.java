@@ -2,6 +2,7 @@ package hu.targetshooting.controller;
 
 import hu.targetshooting.model.domain.ShotResult;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,15 +22,31 @@ public class ShotService {
                 .collect(Collectors.joining(" "));
     }
 
-    public String getTwoSuccessShotIds2() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < results.size(); i++) {
-            ShotResult result = results.get(i);
-            if (result.hasTwoSuccessShotsInRow()) {
-                int id = result.getId();
-                sb = sb.append(id).append(" ");
-            }
-        }
-        return sb.toString();
+    public int getLongestShotSequenceId() {
+        return results.stream()
+                .max(Comparator.comparing(ShotResult::getShotCount))
+                .map(ShotResult::getId)
+                .get();
     }
+
+    public String getSuccessShotIndexesById(int id) {
+        return getResultById(id).getSuccessShotIndexes();
+    }
+
+    public long countSuccessShotsById(int id) {
+        return getResultById(id).countSuccessShots();
+    }
+
+    public int getScoreById(int id) {
+        return getResultById(id).getScore();
+    }
+
+    private ShotResult getResultById(int id) {
+        return results.stream()
+                .filter(i -> i.getId() == id)
+                .findFirst()
+                .get();
+    }
+
+
 }
